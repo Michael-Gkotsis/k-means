@@ -38,10 +38,10 @@ int main()
     do
     {
         fscanf(Dataset, "%c", &c);
-        if (c == ' ' || c == ',')
+        if (c == ',')
             dim++;
     } while (c != '\n');
-
+       dim++;
     rewind(Dataset); // File reset
 
 
@@ -121,7 +121,7 @@ int main()
     {
         for (d = 0; d < dim; d++)
         {
-            fscanf(Dataset, "%lf", &X[i][d]);
+            fscanf(Dataset, "%lf,", &X[i][d]);
         }
     }
 
@@ -159,7 +159,7 @@ int main()
 
           for(j = 0; j < k; j++)
              for(d = 0; d < dim; d++)
-               {
+               {atom://teletype/portal/ac639697-42d6-4f8d-9adb-519107799f97
                  totalCluster[j][d] = 0;
                  counter[j] = 0;
                }
@@ -252,7 +252,7 @@ printf("\n\n Amount of Iterations: %d\n\n",iteration+1);
    for(j = 0 ; j < k ; j++)
    {
      char fileName [100];
-     sprintf(fileName,"Cluster_%d.txt",j);
+     sprintf(fileName,"Cluster_%d.csv",j);
       Cluster[j] = fopen(fileName,"w");
    }
  c = '\n';
@@ -260,8 +260,13 @@ printf("\n\n Amount of Iterations: %d\n\n",iteration+1);
 for(i = 0; i < n-1; i++){
    for( j = 0; j < k; j++){
       for(d = 1; d <= dim; d++){
-          if(C[i][0] == j)
-          fprintf(Cluster[j], "%lf ",C[i][d]);
+          if(C[i][0] == j){
+          fprintf(Cluster[j], "%lf",C[i][d]);
+          if(d <= dim - 1)
+          {
+            fprintf(Cluster[j],", ");
+          }
+        }
         }
  fprintf(Cluster[j], "\n" );
  }
@@ -272,13 +277,17 @@ fclose(Cluster[j]);
 
 
 //Creating and writing to a file the Final Centroids
-Centroids = fopen("FinalCentroids.txt","w");
+Centroids = fopen("FinalCentroids.csv","w");
 
 for(j = 0; j < k; j++){
     if(j != 0)
     fprintf(Centroids, "\n");
-   for(d = 0; d < dim; d++)
-   fprintf(Centroids, "%lf ",FlagCentroids[j][d]);
+   for(d = 0; d < dim; d++){
+   fprintf(Centroids, "%lf",FlagCentroids[j][d]);
+   if(d < dim -1){
+     fprintf(Centroids,", ");
+   }
+ }
 }
    fclose(Centroids);
 /* -------------------------------------------------------------------------- */
@@ -290,14 +299,14 @@ char str[MAX];
 for(j = 0 ; j < k ; j++)
 {
   char fileName [100] ;
-  sprintf(fileName,"Cluster_%d.txt",j);
+  sprintf(fileName,"Cluster_%d.csv",j);
    initialFile[j] = fopen(fileName,"r");
 }
 
 for(j = 0 ; j < k ; j++)
 {
   char fileName [100] ;
-  sprintf(fileName,"Cluster%d.txt",j);
+  sprintf(fileName,"c%d.csv",j);
    finalFile[j] = fopen(fileName,"w");
 }
 
@@ -326,7 +335,7 @@ fclose(finalFile[j]);
 for(j = 0 ; j < k ; j++)
 {
   char fileName [100] ;
-  sprintf(fileName,"Cluster_%d.txt",j);
+  sprintf(fileName,"Cluster_%d.csv",j);
    remove(fileName);
 }
 
