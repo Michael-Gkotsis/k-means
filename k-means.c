@@ -38,7 +38,7 @@ int main()
     do
     {
         fscanf(Dataset, "%c", &c);
-        if (c == ' ')
+        if (c == ' ' || c == ',')
             dim++;
     } while (c != '\n');
 
@@ -348,4 +348,3 @@ for(j = 0 ; j < k ; j++)
 
     return 0;
 }
-
