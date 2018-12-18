@@ -106,9 +106,11 @@ int main()
 
     FILE** Cluster = calloc(k+1,sizeof(FILE*));
 
-    FILE** fp1 = calloc(k+1,sizeof(FILE*));
+    FILE** initialFile = calloc(k+1,sizeof(FILE*));
 
-    FILE** fp2 = calloc(k+1,sizeof(FILE*));
+    FILE** finalFile = calloc(k+1,sizeof(FILE*));
+
+    FILE* Centroids;
 
 
 
@@ -249,9 +251,9 @@ printf("\n\n Amount of Iterations: %d\n\n",iteration+1);
 
    for(j = 0 ; j < k ; j++)
    {
-     char filename [100];
-     sprintf(filename,"Cluster%d.txt",j);
-      Cluster[j] = fopen(filename,"w");
+     char fileName [100];
+     sprintf(fileName,"Cluster_%d.txt",j);
+      Cluster[j] = fopen(fileName,"w");
    }
  c = '\n';
 
@@ -267,6 +269,18 @@ for(i = 0; i < n-1; i++){
 
 for (j = 0; j < k; j++)
 fclose(Cluster[j]);
+
+
+//Creating and writing to a file the Final Centroids
+Centroids = fopen("FinalCentroids.txt","w");
+
+for(j = 0; j < k; j++){
+    if(j != 0)
+    fprintf(Centroids, "\n");
+   for(d = 0; d < dim; d++)
+   fprintf(Centroids, "%lf ",FlagCentroids[j][d]);
+}
+   fclose(Centroids);
 /* -------------------------------------------------------------------------- */
        // Deleting Empty rows and Blank rows
 
@@ -275,46 +289,46 @@ char str[MAX];
 
 for(j = 0 ; j < k ; j++)
 {
-  char filename [100] ;
-  sprintf(filename,"Cluster%d.txt",j);
-   fp1[j] = fopen(filename,"r");
+  char fileName [100] ;
+  sprintf(fileName,"Cluster_%d.txt",j);
+   initialFile[j] = fopen(fileName,"r");
 }
 
 for(j = 0 ; j < k ; j++)
 {
-  char filename [100] ;
-  sprintf(filename,"Cluster_%d.txt",j);
-   fp2[j] = fopen(filename,"w");
+  char fileName [100] ;
+  sprintf(fileName,"Cluster%d.txt",j);
+   finalFile[j] = fopen(fileName,"w");
 }
 
 for(j = 0; j < k; j++)
 {
-   while(!feof(fp1[j]))
+   while(!feof(initialFile[j]))
    {
-     fgets(str,MAX,fp1[j]);
+     fgets(str,MAX,initialFile[j]);
      if(strcmp(str,"\n") == 0)
      {
        continue;
      }
-     fputs(str,fp2[j]);
+     fputs(str,finalFile[j]);
      strcpy(str, "\0");
    }
 }
 
-for(j = 0; j < k; j++)
-fclose(fp1[j]);
 
 for(j = 0; j < k; j++)
-fclose(fp2[j]);
+fclose(initialFile[j]);
+
+for(j = 0; j < k; j++)
+fclose(finalFile[j]);
 
 //Deleting Useless Files
 for(j = 0 ; j < k ; j++)
 {
-  char filename [100] ;
-  sprintf(filename,"Cluster%d.txt",j);
-   remove(filename);
+  char fileName [100] ;
+  sprintf(fileName,"Cluster_%d.txt",j);
+   remove(fileName);
 }
-
 
 /* -------------------------------------------------------------------------- */
     // FREE EVERYTHING
@@ -329,8 +343,8 @@ for(j = 0 ; j < k ; j++)
     free(min);
     free(location);
     free(Cluster);
-    free(fp1);
-    free(fp2);
+    free(initialFile);
+    free(finalFile);
 
     return 0;
 }
