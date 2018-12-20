@@ -114,6 +114,7 @@ int main()
 
 
 
+
 /* -------------------------------------------------------------------------- */
     // Passing elements to Array X[n][dim]
 
@@ -159,7 +160,7 @@ int main()
 
           for(j = 0; j < k; j++)
              for(d = 0; d < dim; d++)
-               {atom://teletype/portal/ac639697-42d6-4f8d-9adb-519107799f97
+               {
                  totalCluster[j][d] = 0;
                  counter[j] = 0;
                }
@@ -338,6 +339,14 @@ for(j = 0 ; j < k ; j++)
   sprintf(fileName,"Cluster_%d.csv",j);
    remove(fileName);
 }
+for(j = 20 ; j >= k ; j--)
+{
+  char fileName [100] ;
+  sprintf(fileName,"c%d.csv",j);
+   remove(fileName);
+}
+
+
 
 /* -------------------------------------------------------------------------- */
     // FREE EVERYTHING
@@ -354,6 +363,7 @@ for(j = 0 ; j < k ; j++)
     free(Cluster);
     free(initialFile);
     free(finalFile);
+
 
     return 0;
 }
