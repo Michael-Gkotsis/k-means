@@ -3,10 +3,10 @@
 #include <time.h>
 #include <string.h>
 
-int main()
+int main(int argc, char *argv[])
 {
 
-    int n = 0;          // n Elements  // For all loops always i < n-1 !!WARNING SOS!!                 // return 0 --> programm ended
+    int n = 0;          // n Elements                // return 0 --> programm ended
     int k;              // k clusters                                                                  // return -1 --> problem with the given file
     int i, j;           // i counter for n, j counter for k
     int d;              // d counter for dimensions
@@ -17,11 +17,11 @@ int main()
 		int iteration = 0;  // Amount of repetitions
 		int flag_end = 0;   // Flag for ending k-means
 		int flag = -1;      // Flag for filtering
-
+ srand(time(NULL));
 /* -------------------------------------------------------------------------- */
     // Reading Dataset, counting n elements, assigning to X Array
 
-    FILE *Dataset;
+    FILE* Dataset;
 
        printf("\n Give the DataSet file:");
        scanf("%s", fileName);
@@ -55,19 +55,19 @@ int main()
     } while (!feof(Dataset));
 
     rewind(Dataset); // File reset
-
-    printf("\n Elements:%d \n", n - 1);
+  n--;
+    printf("\n Elements:%d \n", n);
     printf("\n Dimensions:%d \n", dim);
 
 /* -------------------------------------------------------------------------- */
     printf("\n Choose the amount of Clusters:");
     scanf("%d", &k);
 /* -------------------------------------------------------------------------- */
-    // All the necessary memory alocation
+    // All the necessary memory allocation
 
     double **X;  // Array of Elements
-    X = calloc(n - 1, sizeof(double));
-    for (d = 0; d < n - 1; d++)
+    X = calloc(n, sizeof(double));
+    for (d = 0; d < n; d++)
         X[d] = calloc(dim, sizeof(double));
 
     double **V;  // Array of Centroids
@@ -76,8 +76,8 @@ int main()
         V[d] = calloc(dim, sizeof(double));
 
     double **C;  // Array of Clusters                                            //C[n][dim+1] --> C[n][0] always stands for j
-    C = calloc(k * (n - 1), sizeof(double));
-    for (d = 0; d <= k*(n - 1); d++)
+    C = calloc(k * (n), sizeof(double));
+    for (d = 0; d <= k*(n); d++)
         C[d] = calloc((dim+1), sizeof(double));
 
     double **FlagCentroids;  // Array of flag Centroids
@@ -94,15 +94,15 @@ int main()
 		   totalCluster[d] = calloc(dim,sizeof(double));
 
 		double **distance;  // Array of Distance
-		distance = calloc(n-1,sizeof(double));
-			 for(j = 0; j < n-1; j++)
+		distance = calloc(n,sizeof(double));
+			 for(j = 0; j < n; j++)
 			 distance[j] = calloc(k,sizeof(double));
 
     double *min;  // Array of minimum distance
-    min = calloc(n-1,sizeof(double));
+    min = calloc(n,sizeof(double));
 
     int *location;  // Array of Locations
-    location = calloc(n-1,sizeof(int));
+    location = calloc(n,sizeof(int));
 
     FILE** Cluster = calloc(k+1,sizeof(FILE*));
 
@@ -118,7 +118,9 @@ int main()
 /* -------------------------------------------------------------------------- */
     // Passing elements to Array X[n][dim]
 
-    for (i = 0; !feof(Dataset) && i < n - 1; i++)
+
+   while(!feof(Dataset))
+    for (i = 0;  i < n; i++)
     {
         for (d = 0; d < dim; d++)
         {
@@ -127,16 +129,21 @@ int main()
     }
 
 
+
     fclose(Dataset);
 /* -------------------------------------------------------------------------- */
     // Generating Initial Random Centroids
 
     for (j = 0; j < k; j++)
     {
-      i = ((rand() % ((n - 1) - a + 1)) + a);
+      i = ((rand() % ((n) - a + 1)) + a);
         for (d = 0; d < dim; d++)
             V[j][d] = X[i][d];
     }
+
+
+
+    
 /* -------------------------------------------------------------------------- */
 
 
@@ -167,7 +174,7 @@ int main()
 /* -------------------------------------------------------------------------- */
   // Calculating Distances of each element for each cluster and each dimension
 
-          for(i = 0; i < n-1; i++)
+          for(i = 0; i < n; i++)
              for(j = 0; j < k; j++)
                for(d = 0; d < dim; d++)
              distance[i][j] += ((X[i][d] - V[j][d])*(X[i][d] - V[j][d]));
@@ -176,7 +183,7 @@ int main()
 /* -------------------------------------------------------------------------- */
       // Comparing Distances and getting the proper Cluster for each Element
 
-      for(i=0;i < n-1;i++)
+      for(i=0;i < n;i++)
       {
           min[i]=distance[i][0];
           for(j=0;j < k;j++)
@@ -193,10 +200,10 @@ int main()
 /* -------------------------------------------------------------------------- */
       // Getting Elements and Clusters all together
 
-      for(i = 0; i < n-1; i++)
+      for(i = 0; i < n; i++)
       C[i][0] = location[i];
 
-      for(i = 0; i < n-1; i++)
+      for(i = 0; i < n; i++)
          for(d = 1; d <= dim; d++)
        C[i][d] = X[i][d-1];
 
@@ -204,7 +211,7 @@ int main()
 /* -------------------------------------------------------------------------- */
       // Calculating total Sum of each dim for each cluster and counter
 
-       for(i = 0; i < n-1; i++)
+       for(i = 0; i < n; i++)
           for(j = 0; j < k; j++)
              for(d = 0; d < dim; d++)
               if(C[i][0] == j)
@@ -230,6 +237,7 @@ int main()
                     if(FlagCentroids[j][d] != V[j][d])
                     {
                         flag_end = 0;
+                        break;
                     }else
                     {
                         flag_end = -1;
@@ -256,9 +264,9 @@ printf("\n\n Amount of Iterations: %d\n\n",iteration+1);
      sprintf(fileName,"Cluster_%d.csv",j);
       Cluster[j] = fopen(fileName,"w");
    }
- c = '\n';
 
-for(i = 0; i < n-1; i++){
+
+for(i = 0; i < n; i++){
    for( j = 0; j < k; j++){
       for(d = 1; d <= dim; d++){
           if(C[i][0] == j){
@@ -331,7 +339,7 @@ fclose(initialFile[j]);
 
 for(j = 0; j < k; j++)
 fclose(finalFile[j]);
-
+/* -------------------------------------------------------------------------- */
 //Deleting Useless Files
 for(j = 0 ; j < k ; j++)
 {
