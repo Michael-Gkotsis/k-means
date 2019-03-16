@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 
     printf("\n Elements:%d \n", n-1);
     printf("\n Dimensions:%d \n", dim);
-
+ n--;
     printf("\n Choose the amount of Clusters:");
     scanf("%d", &k);
 
@@ -60,50 +60,50 @@ int main(int argc, char *argv[])
         // All the necessary memory allocation
 
         double **X;   // Array of Elements
-        X = calloc(n, sizeof(double));
+        X = (double **)calloc(n, sizeof(double *));
         for (d = 0; d < n; d++)
-        X[d] = calloc(dim, sizeof(double));
+        X[d] = (double *)calloc(dim, sizeof(double));
 
         double **V;  // Array of Centroids
-            V = calloc(k, sizeof(double));
+            V = (double **)calloc(k, sizeof(double *));
             for (d = 0; d < k; d++)
-                V[d] = calloc(dim, sizeof(double));
+                V[d] =(double *) calloc(dim, sizeof(double));
 
                 double **FlagCentroids;  // Array of flag Centroids
-            FlagCentroids = calloc(k, sizeof(double));
+            FlagCentroids = (double **)calloc(k, sizeof(double *));
             for (d = 0; d < k; d++)
-                FlagCentroids[d] = calloc(dim, sizeof(double));
+                FlagCentroids[d] = (double *)calloc(dim, sizeof(double));
 
-                int *counter;  // Counter of elements for each cluster
-            counter = calloc(k, sizeof(int));
+            int *counter;  // Counter of elements for each cluster
+            counter =(int *) calloc(k, sizeof(int));
 
         		double **totalCluster;  // Sum of every element for each cluster
-            totalCluster= calloc(k,sizeof(double));
+            totalCluster = (double **)calloc(k,sizeof(double *));
         		for(d = 0; d < k; d++)
-        		   totalCluster[d] = calloc(dim,sizeof(double));
+        		   totalCluster[d] =(double *) calloc(dim,sizeof(double));
 
         		double **distance;  // Array of Distance
-        		distance = calloc(n,sizeof(double));
+        		distance = (double **)calloc(n,sizeof(double *));
         			 for(j = 0; j < n; j++)
-        			 distance[j] = calloc(k,sizeof(double));
+        			 distance[j] =(double *)calloc(k,sizeof(double));
 
             double *min;  // Array of minimum distance
-            min = calloc(n,sizeof(double));
+            min = (double *)calloc(n,sizeof(double));
 
             int *location;  // Array of Locations
-            location = calloc(n,sizeof(int));
+            location = (int *)calloc(n,sizeof(int));
 
             int *Cluster;  // Array of Clusters
-            Cluster = calloc(n,sizeof(int));
+            Cluster = (int *)calloc(n,sizeof(int));
 
 
 /* -------------------------------------------------------------------------- */
                   // Passing elements to Array X[n][dim]
-                 n--;
+
 
 
                     X = getData(Dataset,n,dim,X);
-                    
+
 
 
             fclose(Dataset);
@@ -253,7 +253,7 @@ end = clock();
 double total_time = ((double) (end - start)) / CLOCKS_PER_SEC;
 printf("\n Time of Algorithm Execution: %lf \n\n",total_time);
 
-FILE** ClusterFile = calloc(k+1,sizeof(FILE*));
+FILE** ClusterFile =(FILE**) calloc(k+1,sizeof(FILE*));
 
 for(j = 0 ; j < k ; j++)
    {
@@ -291,15 +291,27 @@ for(j = 0; j < k; j++)
    free(fileName);
 }
 
-free(X);
+  for(i = 0; i < n; i++)
+  free(X[i]);
+  free(X);
+  for(i = 0; i < k; i++)
+  free(V[i]);
   free(V);
   free(Cluster);
-free(FlagCentroids);
+  for(i = 0; i < k; i++)
+  free(FlagCentroids[i]);
+  free(FlagCentroids);
   free(counter);
+  for(i = 0; i < n; i++)
+  free(totalCluster[i]);
   free(totalCluster);
+  for(i = 0; i < n; i++)
+  free(distance[i]);
   free(distance);
   free(min);
   free(location);
+  for(i = 0; i < k; i++)
+  free(ClusterFile[i]);
   free(ClusterFile);
 return 0;
 }
