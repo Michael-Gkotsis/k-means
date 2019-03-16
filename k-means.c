@@ -9,10 +9,13 @@
 int main(int argc, char *argv[])
 {
 
-      int n = 0;           // n Elements
+  int n = 0;           // n Elements               // return 0 --> programm ended
       int k;               // k clusters                                                               // return -1 --> problem with the given file
-      int i, j, d;         // i counter for n, j counter for k, d counter for dimensions               // return -2 --> problem with the initial file
+      int i, j, d;         // i counter for n, j counter for k, d counter for dimensions
       char filename[100];  // The Variable for loading Custom Dataset
+      int dim = 0;         // Dimensions of Elements
+      char c;              // Temporary character for file analysis
+      int a = 1;           // Use a = 1 to generate random Centroids
   		int iteration = 0;   // Amount of repetitions
   		int flag_end = 0;    // Flag for ending k-means
   		int flag = -1;       // Flag for filtering
@@ -49,7 +52,7 @@ int main(int argc, char *argv[])
 
     printf("\n Elements:%d \n", n-1);
     printf("\n Dimensions:%d \n", dim);
- n--;
+
     printf("\n Choose the amount of Clusters:");
     scanf("%d", &k);
 
@@ -98,7 +101,7 @@ int main(int argc, char *argv[])
                   // Passing elements to Array X[n][dim]
 
 
-
+ n--;
                     X = getData(Dataset,n,dim,X);
 
 
@@ -250,7 +253,7 @@ end = clock();
 double total_time = ((double) (end - start)) / CLOCKS_PER_SEC;
 printf("\n Time of Algorithm Execution: %lf \n\n",total_time);
 
-FILE** ClusterFile =(FILE**) calloc(k+1,sizeof(FILE*));
+FILE** ClusterFile =calloc(k+1,sizeof(FILE*));
 
 for(j = 0 ; j < k ; j++)
    {
@@ -299,7 +302,7 @@ for(j = 0; j < k; j++)
   free(FlagCentroids[i]);
   free(FlagCentroids);
   free(counter);
-  for(i = 0; i < n; i++)
+  for(i = 0; i < k; i++)
   free(totalCluster[i]);
   free(totalCluster);
   for(i = 0; i < n; i++)
@@ -307,8 +310,6 @@ for(j = 0; j < k; j++)
   free(distance);
   free(min);
   free(location);
-  for(i = 0; i < k; i++)
-  free(ClusterFile[i]);
   free(ClusterFile);
 return 0;
 }
