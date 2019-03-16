@@ -9,13 +9,10 @@
 int main(int argc, char *argv[])
 {
 
-  int n = 0;           // n Elements  // For all loops always i < n !!!WARNING SOS!!!                // return 0 --> programm ended
+      int n = 0;           // n Elements
       int k;               // k clusters                                                               // return -1 --> problem with the given file
       int i, j, d;         // i counter for n, j counter for k, d counter for dimensions               // return -2 --> problem with the initial file
-      char filename[100];  // The Variable for loading Custom Dataset                                  // return -3 --> problem with the error file
-      int dim = 0;         // Dimensions of Elements                                                   // return -4 --> problem with the error file 2.0
-      char c;              // Temporary character for file analysis                                    // return -5 --> problem with the final file
-      int a = 1;           // Use a = 1 to generate random Centroids                                   // return -6 --> problem with the result file
+      char filename[100];  // The Variable for loading Custom Dataset
   		int iteration = 0;   // Amount of repetitions
   		int flag_end = 0;    // Flag for ending k-means
   		int flag = -1;       // Flag for filtering
