@@ -9,18 +9,18 @@
 int main(int argc, char *argv[])
 {
 
-  int n = 0;           // n Elements               // return 0 --> programm ended
-      int k;               // k clusters                                                               // return -1 --> problem with the given file
-      int i, j, d;         // i counter for n, j counter for k, d counter for dimensions
+      unsigned int n = 0;           // n Elements               // return 0 --> programm ended
+      unsigned int k;               // k clusters                                                               // return -1 --> problem with the given file
+      unsigned int i, j, d;         // i counter for n, j counter for k, d counter for dimensions
       char filename[100];  // The Variable for loading Custom Dataset
-      int dim = 0;         // Dimensions of Elements
+      unsigned int dim = 0;         // Dimensions of Elements
       char c;              // Temporary character for file analysis
-      int a = 1;           // Use a = 1 to generate random Centroids
-  		int iteration = 0;   // Amount of repetitions
+      unsigned int a = 1;           // Use a = 1 to generate random Centroids
+  		unsigned int iteration = 0;   // Amount of repetitions
   		int flag_end = 0;    // Flag for ending k-means
   		int flag = -1;       // Flag for filtering
       clock_t start, end;  // Count the time
-  int choise;// Choise holder for switch
+
 
 
 /* -------------------------------------------------------------------------- */
@@ -52,61 +52,57 @@ int main(int argc, char *argv[])
 
     printf("\n Elements:%d \n", n-1);
     printf("\n Dimensions:%d \n", dim);
-
+    n--;
     printf("\n Choose the amount of Clusters:");
     scanf("%d", &k);
 
 /* -------------------------------------------------------------------------- */
         // All the necessary memory allocation
 
-        double **X;   // Array of Elements
-        X = (double **)calloc(n, sizeof(double *));
-        for (d = 0; d < n; d++)
-        X[d] = (double *)calloc(dim, sizeof(double));
+        float *X;  // Array of Elements
+        X = (float *)calloc(n*dim, sizeof(float));
 
-        double **V;  // Array of Centroids
-            V = (double **)calloc(k, sizeof(double *));
-            for (d = 0; d < k; d++)
-                V[d] =(double *) calloc(dim, sizeof(double));
+        float *V;  // Array of Centroids
+        V = (float *)calloc(k*dim, sizeof(float));
 
-                double **FlagCentroids;  // Array of flag Centroids
-            FlagCentroids = (double **)calloc(k, sizeof(double *));
-            for (d = 0; d < k; d++)
-                FlagCentroids[d] = (double *)calloc(dim, sizeof(double));
 
-            int *counter;  // Counter of elements for each cluster
-            counter =(int *) calloc(k, sizeof(int));
+        float *FlagCentroids;  // Array of flag Centroids
+        FlagCentroids = (float *)calloc(k*dim, sizeof(float));
 
-        		double **totalCluster;  // Sum of every element for each cluster
-            totalCluster = (double **)calloc(k,sizeof(double *));
-        		for(d = 0; d < k; d++)
-        		   totalCluster[d] =(double *) calloc(dim,sizeof(double));
 
-        		double **distance;  // Array of Distance
-        		distance = (double **)calloc(n,sizeof(double *));
-        			 for(j = 0; j < n; j++)
-        			 distance[j] =(double *)calloc(k,sizeof(double));
+        unsigned int *counter;  // Counter of elements for each cluster
+        counter =(int *) calloc(k, sizeof(int));
 
-            double *min;  // Array of minimum distance
-            min = (double *)calloc(n,sizeof(double));
+        float *totalCluster;  // Sum of every element for each cluster
+        totalCluster = (float *)calloc(k*dim,sizeof(float));
 
-            int *location;  // Array of Locations
-            location = (int *)calloc(n,sizeof(int));
 
-            int *Cluster;  // Array of Clusters
-            Cluster = (int *)calloc(n,sizeof(int));
+        float *distance;  // Array of Distance
+        distance = (float *)calloc(n*n,sizeof(float));
+
+
+        float *min;  // Array of minimum distance
+        min = (float *)calloc(n,sizeof(float));
+
+        unsigned int *location;  // Array of Locations
+        location = (int *)calloc(n,sizeof(int));
+
+        unsigned int *Cluster;  // Array of Clusters
+        Cluster = (int *)calloc(n,sizeof(int));
 
 
 /* -------------------------------------------------------------------------- */
                   // Passing elements to Array X[n][dim]
 
 
- n--;
+
                     X = getData(Dataset,n,dim,X);
 
+                    fclose(Dataset);
 
 
-            fclose(Dataset);
+
+
   start = clock();
 /* -------------------------------------------------------------------------- */
 /* ---------------------------------K-MEANS---------------------------------- */
@@ -114,19 +110,17 @@ int main(int argc, char *argv[])
 /* -------------------------------------------------------------------------- */
     // Generating Initial Random Centroids
 
-    for (j = 0; j < k; j++)
+    for (j = k; j--;)
     {
       i = rand() % n;
-        for (d = 0; d < dim; d++)
-            V[j][d] = X[i][d];
+        for (d = dim; d--;)
+        {
+            V[j*dim + d] = X[i*dim + d];
+              // Assigning the initial random centroids to FlagCentroids
+            FlagCentroids[j*dim + d] = V[j*dim + d];
+          }
     }
 
-/* -------------------------------------------------------------------------- */
-    // Assigning the initial random centroids to FlagCentroids
-
-    for (j = 0; j < k; j++)
-        for (d = 0; d < dim; d++)
-            FlagCentroids[j][d] = V[j][d];
 
 /* -------------------------------------------------------------------------- */
 
@@ -134,27 +128,29 @@ do{
 
 
   //   Setting Sum and Counter of each cluster to 0
-  for(j = 0; j < k; j++)
+  for(j = k; j--;)
   {
-    for(d = 0; d < dim; d++)
+    for(d = dim; d--;)
     {
-      totalCluster[j][d] = 0;
-      counter[j] = 0;
+      totalCluster[j*dim + d] = 0;
+
     }
+        counter[j] = 0;
   }
 
 /* -------------------------------------------------------------------------- */
   // Calculating Distances of each element for each cluster and each dimension
 
-  for(i = 0; i < n; i++)
+  for(i = n; i--;)
   {
-    for(j = 0; j < k; j++)
+    for(j = k; j--;)
     {
-      for(d = 0; d < dim; d++)
+      distance[i*n + j] = 0;
+      for(d = dim; d--;)
       {
-      distance[i][j] += ((X[i][d] - V[j][d])*(X[i][d] - V[j][d]));
+      distance[i*n + j] += ((X[i*dim + d] - V[j*dim + d])*(X[i*dim + d] - V[j*dim + d]));
       }
-      distance[i][j] = sqrt(distance[i][j]);
+      distance[i*n + j] = sqrt(distance[i*n + j]);
     }
   }
 
@@ -164,14 +160,14 @@ do{
 /* -------------------------------------------------------------------------- */
       // Comparing Distances and getting the proper Cluster for each Element
 
-      for(i = 0; i < n; i++)
+      for(i = n; i--;)
       {
-        min[i] = distance[i][0];
-        for(j = 0; j < k; j++)
+        min[i] = 9999;
+        for(j = k; j--;)
         {
-          if(distance[i][j] <= min[i])
+          if(distance[i*n + j] < min[i])
           {
-            min[i] = distance[i][j];
+            min[i] = distance[i*n + j];
             location[i] = j;
           }
         }
@@ -180,20 +176,20 @@ do{
 /* -------------------------------------------------------------------------- */
       // Getting Elements and Clusters all together
 
-      for(i = 0; i < n; i++)
+      for(i = n; i--;)
       Cluster[i] = location[i];
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
       // Calculating total Sum of each dim for each cluster and counter
-      for(i = 0; i < n; i++)
+      for(i = n; i--;)
       {
-        for(j = 0; j < k; j++)
+        for(j = k; j--;)
         {
           if(Cluster[i] == j)
           {
-            for(d = 0; d < dim; d++)
+            for(d = dim; d--;)
             {
-              totalCluster[j][d] += X[i][d];
+              totalCluster[j*dim + d] += X[i*dim + d];
             }
             counter[j]++;
           }
@@ -203,22 +199,22 @@ do{
 /* -------------------------------------------------------------------------- */
     // Calculating New Centroid
 
-    for(j = 0; j < k; j++)
+    for(j = k; j--;)
     {
-      for(d = 0; d < dim; d++)
+      for(d = dim; d--;)
       {
-        V[j][d] = totalCluster[j][d]/counter[j];
+        V[j*dim + d] = totalCluster[j*dim + d]/counter[j];
       }
     }
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
 			// Here goes the comparison last FlagCentroid with new centroids
 
-      for(j = 0; j < k; j++)
+      for(j = k; j--;)
       {
-        for(d = 0; d < dim; d++)
+        for(d = dim; d--;)
         {
-          if(FlagCentroids[j][d] != V[j][d])
+          if(FlagCentroids[j*dim + d] != V[j*dim + d])
           {
             flag_end = 0;
             break;
@@ -232,11 +228,11 @@ do{
 /* -------------------------------------------------------------------------- */
  // Passing New centroids to flag;
 
- for(j = 0; j < k; j++)
+ for(j = k; j--;)
  {
-   for(d = 0; d < dim; d++)
+   for(d = dim; d--;)
    {
-     FlagCentroids[j][d] = V[j][d];
+     FlagCentroids[j*dim + d] = V[j*dim + d];
    }
  }
 
@@ -255,7 +251,7 @@ printf("\n Time of Algorithm Execution: %lf \n\n",total_time);
 
 FILE** ClusterFile =calloc(k+1,sizeof(FILE*));
 
-for(j = 0 ; j < k ; j++)
+for(j = k; j--;)
    {
      char *fileName;
     fileName = calloc(n,sizeof(char));
@@ -264,22 +260,22 @@ for(j = 0 ; j < k ; j++)
       free(fileName);
    }
 
-for(j = 0; j < k; j++)
+for(j = k; j--;)
 {
-  for(i = 0; i < n; i++)
+  for(i = n; i--;)
   {
     if(Cluster[i] == j)
     {
-      for(d = 0; d < dim; d++)
+      for(d = dim; d--;)
       {
-        fprintf(ClusterFile[j], "%lf ",X[i][d] );
+        fprintf(ClusterFile[j], "%lf ",X[i*dim + d] );
       }
       fprintf(ClusterFile[j], "\n");
     }
   }
 }
 
-   for (j = 0; j < k; j++)
+   for (j = k; j--;)
    fclose(ClusterFile[j]);
 
    for(j = 60 ; j >= k ; j--)
@@ -291,22 +287,13 @@ for(j = 0; j < k; j++)
    free(fileName);
 }
 
-  for(i = 0; i < n; i++)
-  free(X[i]);
+
   free(X);
-  for(i = 0; i < k; i++)
-  free(V[i]);
   free(V);
   free(Cluster);
-  for(i = 0; i < k; i++)
-  free(FlagCentroids[i]);
   free(FlagCentroids);
   free(counter);
-  for(i = 0; i < k; i++)
-  free(totalCluster[i]);
   free(totalCluster);
-  for(i = 0; i < n; i++)
-  free(distance[i]);
   free(distance);
   free(min);
   free(location);
